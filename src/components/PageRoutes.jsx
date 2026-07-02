@@ -5,6 +5,7 @@ import Pos from '../pages/Pos';
 import Admin from '../pages/Admin';
 import UserManagement from '../pages/UserManagement';
 import MpesaSettings from '../pages/MpesaSettings';
+import SalesReport from '../pages/SalesReport';
 import CustomerDisplay from '../pages/CustomerDisplay';
 import Navbar from './Navbar';
 
