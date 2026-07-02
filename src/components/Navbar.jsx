@@ -14,6 +14,7 @@ function Navbar({
   backLabel = 'Back',
   onProducts,
   onUsers,
+  onMpesa,
   onReport,
   onToggleSplitView,
   onCustomerDisplay,
@@ -86,6 +87,14 @@ function Navbar({
               title="Users"
             >
               👥 <span className="label">Users</span>
+            </button>
+            <button
+              type="button"
+              className={`navbar-nav-btn ${activePage === 'mpesa' ? 'active' : ''}`}
+              onClick={onMpesa}
+              title="M-Pesa"
+            >
+              📱 <span className="label">M-Pesa</span>
             </button>
             <button
               type="button"

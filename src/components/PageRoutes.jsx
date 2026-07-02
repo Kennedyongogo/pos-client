@@ -4,7 +4,7 @@ import OwnerDashboard from '../pages/OwnerDashboard';
 import Pos from '../pages/Pos';
 import Admin from '../pages/Admin';
 import UserManagement from '../pages/UserManagement';
-import SalesReport from '../pages/SalesReport';
+import MpesaSettings from '../pages/MpesaSettings';
 import CustomerDisplay from '../pages/CustomerDisplay';
 import Navbar from './Navbar';
 
@@ -70,6 +70,14 @@ function PageRoutes() {
         }
       />
       <Route
+        path="/admin/mpesa"
+        element={
+          <ShopShell user={user} activePage="mpesa" onLogout={handleLogout}>
+            <MpesaSettings currentUser={user} />
+          </ShopShell>
+        }
+      />
+      <Route
         path="/admin/reports"
         element={
           <ShopShell user={user} activePage="report" onLogout={handleLogout}>
@@ -89,6 +97,7 @@ function ShopShell({ user, activePage, onLogout, children }) {
   const adminNavProps = user?.role === 'admin' ? {
     onProducts: () => navigate('/admin/products'),
     onUsers: () => navigate('/admin/users'),
+    onMpesa: () => navigate('/admin/mpesa'),
     onReport: () => navigate('/admin/reports'),
     onToggleSplitView: () => navigate('/pos'),
     onCustomerDisplay: () => window.open('/customer-display', '_blank', 'width=500,height=700')

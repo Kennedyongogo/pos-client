@@ -1,0 +1,152 @@
+.mpesa-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+}
+
+.mpesa-loading {
+  text-align: center;
+  padding: 48px;
+  color: #64748b;
+}
+
+.mpesa-hero h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  color: #1e293b;
+}
+
+.mpesa-hero p {
+  margin: 0 0 12px;
+  color: #64748b;
+}
+
+.mpesa-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mpesa-panel {
+  margin-top: 20px;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 22px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+.mpesa-note {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mpesa-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.mpesa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mpesa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mpesa-field.full {
+  grid-column: 1 / -1;
+}
+
+.mpesa-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.mpesa-field input,
+.mpesa-field select {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.mpesa-secret-wrap {
+  position: relative;
+}
+
+.mpesa-secret-wrap input {
+  width: 100%;
+  padding-right: 42px;
+  box-sizing: border-box;
+}
+
+.mpesa-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.mpesa-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.mpesa-btn-primary,
+.mpesa-btn-secondary {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mpesa-btn-primary {
+  background: #6c5ce7;
+  color: white;
+}
+
+.mpesa-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mpesa-btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+@media (max-width: 640px) {
+  .mpesa-grid {
+    grid-template-columns: 1fr;
+  }
+}

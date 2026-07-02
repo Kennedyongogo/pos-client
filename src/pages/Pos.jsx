@@ -345,7 +345,7 @@ function Pos({ user, onLogout }) {
         Swal.fire({
           icon: 'warning',
           title: 'M-Pesa not set up',
-          text: 'Ask the system owner to configure M-Pesa for this shop on the hosted server.',
+          text: 'Ask your shop admin to set up M-Pesa under Admin → M-Pesa.',
           confirmButtonColor: '#6c5ce7'
         });
         return;
@@ -478,6 +478,7 @@ function Pos({ user, onLogout }) {
   const adminNavProps = user?.role === 'admin' ? {
     onProducts: () => navigate('/admin/products'),
     onUsers: () => navigate('/admin/users'),
+    onMpesa: () => navigate('/admin/mpesa'),
     onReport: () => navigate('/admin/reports'),
     onToggleSplitView: () => setSplitView((v) => !v),
     onCustomerDisplay: () => window.open('/customer-display', '_blank', 'width=500,height=700')
