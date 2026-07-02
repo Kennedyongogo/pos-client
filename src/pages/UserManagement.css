@@ -396,6 +396,52 @@
   background: #ddd6fe;
 }
 
+.users-reset-pw-intro {
+  margin: 0 0 14px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.users-reset-pw-label {
+  display: block;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #334155;
+}
+
+.users-reset-pw-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.users-reset-pw-input {
+  width: 100% !important;
+  margin: 0 !important;
+  padding-right: 44px !important;
+  box-sizing: border-box;
+}
+
+.users-reset-pw-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+  opacity: 0.7;
+}
+
+.users-reset-pw-toggle:hover {
+  opacity: 1;
+}
+
 .users-btn-deactivate:hover {
   background: #fee2e2;
 }

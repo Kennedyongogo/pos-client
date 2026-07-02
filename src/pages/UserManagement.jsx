@@ -132,20 +132,54 @@ function UserManagement({ currentUser }) {
   };
 
   const handleResetPassword = async (userId, displayName) => {
+    const safeName = String(displayName)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
     const result = await Swal.fire({
       title: 'Reset Password',
-      html: `Set a new password for <b>${displayName}</b>`,
-      input: 'password',
-      inputLabel: 'New password',
-      inputPlaceholder: 'At least 4 characters',
-      inputAttributes: { minlength: 4, autocapitalize: 'off', autocorrect: 'off' },
+      html: `
+        <p class="users-reset-pw-intro">Set a new password for <b>${safeName}</b></p>
+        <label class="users-reset-pw-label" for="swal-reset-password">New password</label>
+        <div class="users-reset-pw-wrap">
+          <input
+            id="swal-reset-password"
+            type="password"
+            class="swal2-input users-reset-pw-input"
+            placeholder="At least 4 characters"
+            minlength="4"
+            autocomplete="new-password"
+          />
+          <button
+            type="button"
+            id="swal-reset-pw-toggle"
+            class="users-reset-pw-toggle"
+            aria-label="Show password"
+          >👁</button>
+        </div>
+      `,
       showCancelButton: true,
       confirmButtonText: 'Save Password',
       confirmButtonColor: '#6c5ce7',
       cancelButtonText: 'Cancel',
-      preConfirm: (value) => {
+      focusConfirm: false,
+      didOpen: () => {
+        const input = document.getElementById('swal-reset-password');
+        const toggle = document.getElementById('swal-reset-pw-toggle');
+        toggle?.addEventListener('click', () => {
+          const show = input.type === 'password';
+          input.type = show ? 'text' : 'password';
+          toggle.textContent = show ? '🙈' : '👁';
+          toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        });
+        input?.focus();
+      },
+      preConfirm: () => {
+        const value = document.getElementById('swal-reset-password')?.value || '';
         if (!value || value.length < 4) {
           Swal.showValidationMessage('Password must be at least 4 characters');
+          return false;
         }
         return value;
       }
