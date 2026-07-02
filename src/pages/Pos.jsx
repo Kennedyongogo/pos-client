@@ -329,13 +329,23 @@ function Pos({ user, onLogout }) {
   };
 
   const handleMpesaCheckout = async () => {
+    if (!isOnline) {
+      Swal.fire({
+        icon: 'info',
+        title: 'M-Pesa needs internet',
+        text: 'Use cash while offline. M-Pesa STK works when you are connected.',
+        confirmButtonColor: '#6c5ce7'
+      });
+      return;
+    }
+
     try {
-      const cfg = await apiGet('/mpesa/config');
-      if (!cfg.data?.configured) {
+      const cfg = await apiGet(`/mpesa/config?client_id=${user.client_id}`);
+      if (!cfg.data?.enabled || !cfg.data?.configured) {
         Swal.fire({
           icon: 'warning',
-          title: 'M-Pesa not configured',
-          text: 'Add M-Pesa credentials to server/.env and restart the POS server.',
+          title: 'M-Pesa not set up',
+          text: 'Ask the system owner to configure M-Pesa for this shop on the hosted server.',
           confirmButtonColor: '#6c5ce7'
         });
         return;
@@ -376,6 +386,7 @@ function Pos({ user, onLogout }) {
 
     try {
       const stkRes = await apiPost('/mpesa/stk-push', {
+        client_id: user.client_id,
         phone: phone.trim(),
         amount: total,
         accountReference: user.business_name || 'POS',
@@ -422,11 +433,11 @@ function Pos({ user, onLogout }) {
 
     const result = await Swal.fire({
       title: 'Payment method',
-      html: `<p style="margin:0;color:#64748b">Total due: <strong style="color:#1e293b">${formatCurrency(total)}</strong></p>`,
+      html: `<p style="margin:0;color:#64748b">Total due: <strong style="color:#1e293b">${formatCurrency(total)}</strong></p>${!isOnline ? '<p style="margin:8px 0 0;font-size:13px;color:#94a3b8">Offline — cash only</p>' : ''}`,
       showCancelButton: true,
       cancelButtonText: 'Cancel',
       confirmButtonText: 'Cash',
-      showDenyButton: true,
+      showDenyButton: isOnline,
       denyButtonText: 'M-Pesa (STK)',
       confirmButtonColor: '#10b981',
       denyButtonColor: '#00a651',

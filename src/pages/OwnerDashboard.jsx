@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Swal from 'sweetalert2';
-import { apiGet, apiPost } from '../utils/api';
+import { apiGet, apiPost, apiPut } from '../utils/api';
 import './OwnerDashboard.css';
 
 const EMPTY_FORM = {
@@ -28,6 +28,19 @@ function OwnerDashboard({ user, onLogout }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [form, setForm] = useState(EMPTY_FORM);
+  const [showMpesaModal, setShowMpesaModal] = useState(false);
+  const [mpesaClient, setMpesaClient] = useState(null);
+  const [mpesaForm, setMpesaForm] = useState({
+    enabled: false,
+    env: 'sandbox',
+    shortcode: '',
+    consumerKey: '',
+    consumerSecret: '',
+    passkey: ''
+  });
+  const [mpesaLoading, setMpesaLoading] = useState(false);
+  const [mpesaSaving, setMpesaSaving] = useState(false);
+  const [showMpesaSecrets, setShowMpesaSecrets] = useState(false);
 
   const fetchClients = useCallback(async () => {
     setLoading(true);
@@ -90,6 +103,69 @@ function OwnerDashboard({ user, onLogout }) {
   const closeForm = () => {
     setShowForm(false);
     setForm(EMPTY_FORM);
+  };
+
+  const openMpesaModal = async (client) => {
+    setMpesaClient(client);
+    setShowMpesaSecrets(false);
+    setMpesaLoading(true);
+    setShowMpesaModal(true);
+    try {
+      const res = await apiGet(`/mpesa/settings/${client.id}?userId=${user.id}`);
+      setMpesaForm({
+        enabled: res.data.enabled,
+        env: res.data.env || 'sandbox',
+        shortcode: res.data.shortcode || '',
+        consumerKey: '',
+        consumerSecret: '',
+        passkey: ''
+      });
+    } catch (err) {
+      Swal.fire('Error', err.data?.error || 'Could not load M-Pesa settings', 'error');
+      setShowMpesaModal(false);
+    }
+    setMpesaLoading(false);
+  };
+
+  const closeMpesaModal = () => {
+    setShowMpesaModal(false);
+    setMpesaClient(null);
+    setShowMpesaSecrets(false);
+  };
+
+  const handleSaveMpesa = async (e) => {
+    e.preventDefault();
+    setMpesaSaving(true);
+    try {
+      await apiPut(`/mpesa/settings/${mpesaClient.id}`, {
+        ...mpesaForm,
+        updatedBy: user.id
+      });
+      Swal.fire({
+        title: 'M-Pesa saved',
+        text: 'This shop can use M-Pesa STK when online.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      closeMpesaModal();
+    } catch (err) {
+      Swal.fire('Error', err.data?.error || 'Failed to save M-Pesa settings', 'error');
+    }
+    setMpesaSaving(false);
+  };
+
+  const handleTestMpesa = async () => {
+    try {
+      await apiPut(`/mpesa/settings/${mpesaClient.id}`, {
+        ...mpesaForm,
+        updatedBy: user.id
+      });
+      await apiPost('/mpesa/test-auth', { client_id: mpesaClient.id });
+      Swal.fire('Daraja OK', 'OAuth credentials work for this shop.', 'success');
+    } catch (err) {
+      Swal.fire('Test failed', err.data?.error || err.message || 'Invalid credentials', 'error');
+    }
   };
 
   const handleCreateClient = async (e) => {
@@ -554,8 +630,110 @@ function OwnerDashboard({ user, onLogout }) {
             </div>
 
             <div className="owner-detail-footer">
+              <button type="button" className="owner-btn-mpesa" onClick={() => openMpesaModal(selectedClient)}>
+                M-Pesa setup
+              </button>
               <button type="button" className="owner-btn-cancel" onClick={() => setSelectedClient(null)}>Close</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showMpesaModal && mpesaClient && (
+        <div className="owner-modal-overlay" onClick={closeMpesaModal}>
+          <div className="owner-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="owner-modal-header">
+              <div>
+                <h2>M-Pesa (Daraja)</h2>
+                <p>{mpesaClient.business_name} · {mpesaClient.client_code}</p>
+              </div>
+              <button type="button" className="owner-modal-close" onClick={closeMpesaModal}>✕</button>
+            </div>
+            {mpesaLoading ? (
+              <div className="owner-mpesa-loading">Loading…</div>
+            ) : (
+              <form onSubmit={handleSaveMpesa}>
+                <div className="owner-form-grid owner-mpesa-form">
+                  <label className="owner-mpesa-toggle">
+                    <input
+                      type="checkbox"
+                      checked={mpesaForm.enabled}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, enabled: e.target.checked })}
+                    />
+                    <span>Enable M-Pesa STK for this shop</span>
+                  </label>
+                  <div className="owner-form-group">
+                    <label>Environment</label>
+                    <select
+                      value={mpesaForm.env}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, env: e.target.value })}
+                    >
+                      <option value="sandbox">Sandbox (testing)</option>
+                      <option value="production">Production (live)</option>
+                    </select>
+                  </div>
+                  <div className="owner-form-group">
+                    <label>Business shortcode / till</label>
+                    <input
+                      value={mpesaForm.shortcode}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, shortcode: e.target.value })}
+                      placeholder="174379"
+                      required={mpesaForm.enabled}
+                    />
+                  </div>
+                  <div className="owner-form-group full-width">
+                    <label>Consumer key</label>
+                    <input
+                      type={showMpesaSecrets ? 'text' : 'password'}
+                      value={mpesaForm.consumerKey}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, consumerKey: e.target.value })}
+                      placeholder="Leave blank to keep existing"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="owner-form-group full-width">
+                    <label>Consumer secret</label>
+                    <input
+                      type={showMpesaSecrets ? 'text' : 'password'}
+                      value={mpesaForm.consumerSecret}
+                      onChange={(e) => setMpesaForm({ ...mpesaForm, consumerSecret: e.target.value })}
+                      placeholder="Leave blank to keep existing"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="owner-form-group full-width">
+                    <label>Lipa Na M-Pesa passkey</label>
+                    <div className="owner-mpesa-secret-wrap">
+                      <input
+                        type={showMpesaSecrets ? 'text' : 'password'}
+                        value={mpesaForm.passkey}
+                        onChange={(e) => setMpesaForm({ ...mpesaForm, passkey: e.target.value })}
+                        placeholder="Leave blank to keep existing"
+                        autoComplete="off"
+                      />
+                      <button
+                        type="button"
+                        className="owner-mpesa-eye"
+                        onClick={() => setShowMpesaSecrets(!showMpesaSecrets)}
+                        aria-label={showMpesaSecrets ? 'Hide secrets' : 'Show secrets'}
+                      >
+                        {showMpesaSecrets ? '🙈' : '👁'}
+                      </button>
+                    </div>
+                  </div>
+                  <p className="owner-form-hint full-width">
+                    Callback URL is set on the VPS server (.env). M-Pesa only works when the shop is online.
+                  </p>
+                </div>
+                <div className="owner-modal-actions">
+                  <button type="button" className="owner-btn-cancel" onClick={closeMpesaModal}>Cancel</button>
+                  <button type="button" className="owner-btn-cancel" onClick={handleTestMpesa}>Test OAuth</button>
+                  <button type="submit" className="owner-btn-submit" disabled={mpesaSaving}>
+                    {mpesaSaving ? 'Saving…' : 'Save M-Pesa'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

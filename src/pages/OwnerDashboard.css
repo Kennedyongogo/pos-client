@@ -828,8 +828,66 @@
   padding: 12px 18px 16px;
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
   background: white;
   border-top: 1px solid #f1f5f9;
+}
+
+.owner-btn-mpesa {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  background: #ecfdf5;
+  color: #059669;
+  cursor: pointer;
+}
+
+.owner-btn-mpesa:hover {
+  background: #d1fae5;
+}
+
+.owner-mpesa-form {
+  padding: 0 18px 8px;
+}
+
+.owner-mpesa-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  grid-column: 1 / -1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.owner-mpesa-secret-wrap {
+  position: relative;
+}
+
+.owner-mpesa-secret-wrap input {
+  width: 100%;
+  padding-right: 42px;
+}
+
+.owner-mpesa-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.75;
+}
+
+.owner-mpesa-loading {
+  padding: 32px;
+  text-align: center;
+  color: #64748b;
 }
 
 .owner-detail-footer .owner-btn-cancel {
