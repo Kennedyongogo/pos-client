@@ -92,12 +92,18 @@ function MpesaSettings({ currentUser }) {
       </header>
 
       <div className="mpesa-panel">
-        <p className="mpesa-note">
-          M-Pesa STK only works when the shop is <strong>online</strong>. Use cash when offline.
-          Callback URL is managed on the hosted server.
-        </p>
+        <div className="mpesa-panel-header">
+          <h2>Daraja credentials</h2>
+          <p>Enter your shop&apos;s Safaricom developer app keys and Lipa Na M-Pesa passkey.</p>
+        </div>
 
-        <form onSubmit={handleSave} className="mpesa-form">
+        <div className="mpesa-panel-body">
+          <p className="mpesa-note">
+            M-Pesa STK only works when the shop is <strong>online</strong>. Use cash when offline.
+            Callback URL is managed on the hosted server.
+          </p>
+
+          <form onSubmit={handleSave} className="mpesa-form">
           <label className="mpesa-toggle">
             <input
               type="checkbox"
@@ -177,7 +183,8 @@ function MpesaSettings({ currentUser }) {
               {saving ? 'Saving…' : 'Save M-Pesa settings'}
             </button>
           </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
