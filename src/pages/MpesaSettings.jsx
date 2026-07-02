@@ -119,7 +119,10 @@ function MpesaSettings({ currentUser }) {
           </p>
           {form.env === 'sandbox' && (
             <p className="mpesa-note mpesa-sandbox-hint">
-              Sandbox defaults: shortcode <code>174379</code>, passkey from Safaricom portal (or sandbox test passkey).
+              Sandbox test values: shortcode <code>174379</code>, passkey{' '}
+              <code>bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919</code>.
+              Use the <strong>Lipa Na M-Pesa Online</strong> passkey — not Security Credential.
+              Test phone: <code>254708374149</code>.
             </p>
           )}
 
@@ -174,7 +177,7 @@ function MpesaSettings({ currentUser }) {
               />
             </div>
             <div className="mpesa-field full">
-              <label>Lipa Na M-Pesa passkey</label>
+              <label>Lipa Na M-Pesa Online passkey</label>
               <div className="mpesa-secret-wrap">
                 <input
                   type={showSecrets ? 'text' : 'password'}
