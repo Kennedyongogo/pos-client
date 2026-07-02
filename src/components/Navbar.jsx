@@ -6,6 +6,8 @@ function Navbar({
   isOnline = true,
   usingCache = false,
   pendingCount = 0,
+  cloudSyncPending = 0,
+  cloudSyncEnabled = false,
   activePage = 'pos',
   splitView = false,
   onBack,
@@ -33,8 +35,12 @@ function Navbar({
     connectionLabel = pendingCount ? `Offline · Cached · ${pendingCount} queued` : 'Offline · Cached';
   } else if (!isOnline) {
     connectionLabel = pendingCount ? `Offline · ${pendingCount} queued` : 'Offline';
+  } else if (cloudSyncEnabled && cloudSyncPending > 0) {
+    connectionLabel = `Online · ${cloudSyncPending} pending cloud sync`;
   } else if (pendingCount > 0) {
     connectionLabel = `${pendingCount} sale(s) queued`;
+  } else if (cloudSyncEnabled && isOnline) {
+    connectionLabel = 'Local · Cloud synced';
   }
 
   return (

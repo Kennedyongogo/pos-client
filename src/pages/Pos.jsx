@@ -29,6 +29,8 @@ function Pos({ user, onLogout }) {
   const [isOnline, setIsOnline] = useState(true);
   const [usingCache, setUsingCache] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [cloudSyncPending, setCloudSyncPending] = useState(0);
+  const [cloudSyncEnabled, setCloudSyncEnabled] = useState(false);
   const [receipt, setReceipt] = useState(null);
   const [splitView, setSplitView] = useState(false);
   const [productSearch, setProductSearch] = useState('');
@@ -95,22 +97,44 @@ function Pos({ user, onLogout }) {
 
   const checkConnection = useCallback(async () => {
     try {
-      await apiGet('/health');
+      const health = await apiGet('/health');
       setIsOnline(true);
+      setCloudSyncPending(health.sync?.pending || 0);
+      setCloudSyncEnabled(Boolean(health.sync?.shopMode));
+
       const synced = await flushPendingTransactions();
       if (synced > 0) {
         Swal.fire({
-          title: 'Sales synced',
+          title: 'Sales synced locally',
           text: `${synced} queued sale(s) saved to the local database.`,
           icon: 'success',
           timer: 2500,
           showConfirmButton: false
         });
       }
+
+      if (health.sync?.shopMode) {
+        try {
+          const flush = await apiPost('/sync/flush', {});
+          setCloudSyncPending(flush.data?.pending || 0);
+          if (flush.data?.synced > 0) {
+            Swal.fire({
+              title: 'Synced to cloud',
+              text: `${flush.data.synced} record(s) sent to your hosted server.`,
+              icon: 'success',
+              timer: 2800,
+              showConfirmButton: false
+            });
+            await fetchProducts();
+          }
+        } catch {
+          // VPS unreachable — local sales still work
+        }
+      }
     } catch {
       setIsOnline(false);
     }
-  }, [flushPendingTransactions]);
+  }, [flushPendingTransactions, fetchProducts]);
 
   useEffect(() => {
     if (user && user.role !== 'system_owner') {
@@ -448,7 +472,7 @@ function Pos({ user, onLogout }) {
     onCustomerDisplay: () => window.open('/customer-display', '_blank', 'width=500,height=700')
   } : {};
 
-  const navbarStatusProps = { isOnline, usingCache, pendingCount };
+  const navbarStatusProps = { isOnline, usingCache, pendingCount, cloudSyncPending, cloudSyncEnabled };
 
   return (
     <div className="App">
