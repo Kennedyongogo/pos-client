@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Swal from 'sweetalert2';
-import { apiGet, apiPost, apiDelete } from '../utils/api';
+import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api';
 import './UserManagement.css';
 
 const ROLES = {
@@ -131,18 +131,69 @@ function UserManagement({ currentUser }) {
     }
   };
 
+  const handleResetPassword = async (userId, displayName) => {
+    const result = await Swal.fire({
+      title: 'Reset Password',
+      html: `Set a new password for <b>${displayName}</b>`,
+      input: 'password',
+      inputLabel: 'New password',
+      inputPlaceholder: 'At least 4 characters',
+      inputAttributes: { minlength: 4, autocapitalize: 'off', autocorrect: 'off' },
+      showCancelButton: true,
+      confirmButtonText: 'Save Password',
+      confirmButtonColor: '#6c5ce7',
+      cancelButtonText: 'Cancel',
+      preConfirm: (value) => {
+        if (!value || value.length < 4) {
+          Swal.showValidationMessage('Password must be at least 4 characters');
+        }
+        return value;
+      }
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await apiPut(`/auth/users/${userId}/password`, {
+        password: result.value,
+        updatedBy: currentUser.id
+      });
+      Swal.fire({
+        title: 'Password Updated',
+        text: 'Works on this device now. Syncs to the hosted server when online.',
+        icon: 'success',
+        timer: 2200,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      Swal.fire('Error', err.data?.error || 'Failed to reset password', 'error');
+    }
+  };
+
   const renderAction = (u) => {
-    if (u.role === ROLES.ADMIN) {
-      return <span className="users-protected">Admin account</span>;
+    if (!u.active) {
+      return <span className="users-protected">Inactive</span>;
     }
-    if (u.active) {
-      return (
-        <button type="button" className="users-btn-deactivate" onClick={() => handleDeactivate(u.id, u.username)}>
-          Deactivate
+
+    return (
+      <div className="users-actions">
+        <button
+          type="button"
+          className="users-btn-reset"
+          onClick={() => handleResetPassword(u.id, u.full_name)}
+        >
+          Reset password
         </button>
-      );
-    }
-    return <span className="users-protected">Inactive</span>;
+        {u.role === ROLES.CASHIER && (
+          <button type="button" className="users-btn-deactivate" onClick={() => handleDeactivate(u.id, u.username)}>
+            Deactivate
+          </button>
+        )}
+        {u.role === ROLES.ADMIN && u.id !== currentUser.id && (
+          <span className="users-protected">Admin</span>
+        )}
+      </div>
+    );
   };
 
   return (

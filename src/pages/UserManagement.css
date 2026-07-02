@@ -363,15 +363,37 @@
 }
 
 .users-btn-deactivate {
-  padding: 8px 16px;
-  background: #fef2f2;
-  color: #dc2626;
+  padding: 6px 12px;
   border: none;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 700;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.users-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.users-btn-reset {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #ede9fe;
+  color: #6c5ce7;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.users-btn-reset:hover {
+  background: #ddd6fe;
 }
 
 .users-btn-deactivate:hover {
