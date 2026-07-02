@@ -17,6 +17,7 @@ function MpesaSettings({ currentUser }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showSecrets, setShowSecrets] = useState(false);
+  const [status, setStatus] = useState({ configured: false, hasConsumerKey: false, hasConsumerSecret: false, hasPasskey: false });
 
   const clientId = currentUser.client_id;
 
@@ -35,6 +36,12 @@ function MpesaSettings({ currentUser }) {
         consumerKey: '',
         consumerSecret: '',
         passkey: ''
+      });
+      setStatus({
+        configured: Boolean(res.data.configured),
+        hasConsumerKey: Boolean(res.data.hasConsumerKey),
+        hasConsumerSecret: Boolean(res.data.hasConsumerSecret),
+        hasPasskey: Boolean(res.data.hasPasskey)
       });
     } catch (err) {
       Swal.fire('Error', err.data?.error || 'Could not load M-Pesa settings', 'error');
@@ -101,7 +108,20 @@ function MpesaSettings({ currentUser }) {
           <p className="mpesa-note">
             M-Pesa STK only works when the shop is <strong>online</strong>. Use cash when offline.
             Callback URL is managed on the hosted server.
+            {status.configured ? (
+              <span className="mpesa-status-ok"> ✓ Ready for STK when online</span>
+            ) : (
+              <span className="mpesa-status-warn">
+                {' '}
+                ✗ Not ready — enable M-Pesa, fill shortcode, consumer key/secret, and passkey, then save.
+              </span>
+            )}
           </p>
+          {form.env === 'sandbox' && (
+            <p className="mpesa-note mpesa-sandbox-hint">
+              Sandbox defaults: shortcode <code>174379</code>, passkey from Safaricom portal (or sandbox test passkey).
+            </p>
+          )}
 
           <form onSubmit={handleSave} className="mpesa-form">
           <label className="mpesa-toggle">
